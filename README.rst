@@ -1,0 +1,37 @@
+builder
+########################################
+
+builder is a command line tool to help sysadmin packaging **binaries**
+
+As I am essentially working on **red hast** _based_ distributions, **builder** will prio target `rpm` packages.
+
+However, other **binary** formats, will follow.
+
+Main features
+=============
+
+* RPM building
+
+
+Installation
+============
+
+
+Python version
+--------------
+
+Although Python 2.6 and 2.7 are supported as well, it is recommended to install
+builder against the latest Python 3.x whenever possible.
+
+
+Unstable version
+----------------
+
+You can also instead of the latest the latest unreleased development version
+directly from the ``master`` branch on GitHub.
+It is a work-in-progress of a future stable release so the experience
+might be not as smooth.
+
+.. code-block:: bash
+
+    $ pip install git+https://github.com/waghanza/builder.git@master#builder

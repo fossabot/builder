@@ -1,0 +1,5 @@
+# python3 installation
+
+build/
+dist/
+*.egg-info
