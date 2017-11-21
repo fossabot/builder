@@ -44,9 +44,6 @@ setup(
     ],
     keywords='package linux distribution',
     packages=setuptools.find_packages(),
-    install_requires=[
-        'opster >= 4.1',
-        'python-terraform >= 0.8.6'
-    ],
+    install_requires=open('requirements.txt').readlines(),
     entry_points={'console_scripts': ['builder=builder:cli']}
 )
