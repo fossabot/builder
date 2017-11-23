@@ -1,5 +1,6 @@
 import opster
 
+
 @opster.command()
 def register(provider=('p', 'aws', 'provider to register')):
     """ Register provider credentials """
@@ -12,6 +13,7 @@ def register(provider=('p', 'aws', 'provider to register')):
         module = importlib.import_module('providers.%s' % provider)
     except ModuleNotFoundError:
         raise RuntimeError('No such provider')
+        import sys
         sys.exit(1)
 
     class_name = provider.capitalize()
@@ -21,7 +23,8 @@ def register(provider=('p', 'aws', 'provider to register')):
 
     # Write configuration file
 
-    import configparser, os
+    import configparser
+    import os
 
     config = configparser.ConfigParser()
     config[provider] = credentials
