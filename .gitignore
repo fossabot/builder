@@ -3,3 +3,6 @@
 build/
 dist/
 *.egg-info
+
+# python3 cache
+__pycache__
