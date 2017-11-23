@@ -1,8 +1,9 @@
-from distutils.core import setup
 import setuptools
 import io
-import os
 import re
+import os
+import glob
+import distutils
 
 
 def read(*names, **kwargs):
@@ -25,7 +26,7 @@ def find_version(*file_paths):
     raise RuntimeError("Unable to find version string.")
 
 
-setup(
+distutils.core.setup(
     name='builder',
     version=find_version('builder', 'version.py'),
     description='Builder CLI tool',
@@ -46,5 +47,6 @@ setup(
     packages=setuptools.find_packages(),
     zip_safe=False,
     install_requires=open('requirements.txt').readlines(),
+    data_files=[('templates', glob.glob('templates/*.tf'))],
     entry_points={'console_scripts': ['builder=builder:cli']}
 )

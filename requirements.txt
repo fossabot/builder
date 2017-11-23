@@ -3,3 +3,7 @@ opster >= 4.1
 
 # terraform wrapper
 python-terraform >= 0.8.6
+
+# logic-less template engine
+# to build terraform configuration file
+pystache >= 0.5.4
