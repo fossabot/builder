@@ -24,7 +24,6 @@ def find_version(*file_paths):
         return version_match.group(1)
     raise RuntimeError("Unable to find version string.")
 
-
 setup(
     name='builder',
     version=find_version('builder', 'version.py'),
@@ -44,6 +43,7 @@ setup(
     ],
     keywords='package linux distribution',
     packages=setuptools.find_packages(),
+    zip_safe=False,
     install_requires=open('requirements.txt').readlines(),
     entry_points={'console_scripts': ['builder=builder:cli']}
 )
