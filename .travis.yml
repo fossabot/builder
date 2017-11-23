@@ -10,4 +10,12 @@ matrix:
   allow_failures:
     - python: nightly
 
+install: pip install pyflakes
+
 script: python -m unittest
+
+after_success:
+  - coveralls
+  - pip install pep8 pyflakes
+  - pep8 .
+  - pyflakes .
