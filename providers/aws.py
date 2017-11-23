@@ -5,6 +5,11 @@ class Aws(object):
     __identifier__ = 'aws'
 
     def get_credentials(self):
+        """
+            Get credentials for AWS
+
+            AWS use a secret and an access key
+        """
         secret_key = getpass.getpass('Please enter your secret key (will be hidden): ')
         access_key = getpass.getpass('Please enter your access key (will be hidden): ')
 
