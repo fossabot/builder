@@ -18,6 +18,6 @@ script: python -m unittest
 
 after_success:
   - coveralls
-  - pip install pep8 pyflakes
-  - pep8 .
+  - pip install pycodestyle pyflakes
+  - pycodestyle .
   - pyflakes .
