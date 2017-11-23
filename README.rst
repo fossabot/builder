@@ -20,8 +20,10 @@ Installation
 Python version
 --------------
 
-Although Python 2.6 and 2.7 are supported as well, it is recommended to install
-builder against the latest Python 3.x whenever possible.
+Although Python 2 **SHOULD** be *supported*, it is recommended to install
+*builder* against the latest Python 3.x whenever possible.
+
+See travis configuration file for tested python versions
 
 
 Unstable version

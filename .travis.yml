@@ -1,0 +1,13 @@
+language: python
+
+python:
+  - 3.4 # el7
+  - 3.5 # debian / ubuntu
+  - 3.6 # fedora
+  - nightly
+
+matrix:
+  allow_failures:
+    - python: nightly
+
+script: python -m unittest
