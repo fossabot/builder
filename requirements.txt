@@ -2,8 +2,13 @@
 opster >= 4.1
 
 # terraform wrapper
-python-terraform >= 0.8.6
+python-terraform >= 0.9.1
 
 # logic-less template engine
 # to build terraform configuration file
 pystache >= 0.5.4
+
+# Python ssh utilities
+# All stuff will be executed throught an SSH tunnel
+
+paramiko >= 2.4.0

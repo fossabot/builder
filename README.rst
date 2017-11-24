@@ -37,3 +37,16 @@ might be not as smooth.
 .. code-block:: bash
 
     $ pip install git+https://github.com/waghanza/builder.git@master#builder
+
+
+Usage
+=============
+
+Building could be made on any cloud, but
+
++ Build a RPM for **Amazon Linux** `2017.09`
+
+.. code-block:: bash
+
+  $ builder build-rpm -s ~/workspace/specs/python-six.spec -i ami-8c1be5f6
+
