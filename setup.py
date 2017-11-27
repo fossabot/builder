@@ -47,6 +47,9 @@ distutils.core.setup(
     packages=setuptools.find_packages(),
     zip_safe=False,
     install_requires=open('requirements.txt').readlines(),
-    data_files=[('templates', glob.glob('templates/*.tf'))],
+    data_files=[
+        ('templates', glob.glob('templates/*.tf')),
+        ('profiles', glob.glob('profiles/*.yml'))
+    ],
     entry_points={'console_scripts': ['builder=builder:cli']}
 )

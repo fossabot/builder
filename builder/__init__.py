@@ -55,6 +55,18 @@ def rpm_build(spec=('s', 'spec-file', 'spec file for rpm build process'), identi
         import sys
         sys.exit(1)
 
+    import re
+    import sys
+    import os
+    lines = open(os.path.expanduser(spec)).readlines()
+    binary_options = {}
+    for line in lines:
+        m = re.match(r'^([A-Za-z0-9]+):(.*)', line)
+        if m:
+            key = m.group(1).strip()
+            value = m.group(2).strip()
+            binary_options[key] = value
+
     import configparser
     import os
     import pystache
@@ -69,8 +81,11 @@ def rpm_build(spec=('s', 'spec-file', 'spec file for rpm build process'), identi
         sys.exit(1)
 
     current_directory = os.path.dirname(os.path.realpath(__file__))
+
     template = os.path.join(current_directory, '..',
                             'templates', ('%s.tf' % provider))
+    user_data = os.path.join(current_directory, '..',
+                             'profiles', ('%s.yml' % provider))
     import tempfile
     tmp_file = tempfile.mkstemp()
 
@@ -79,7 +94,11 @@ def rpm_build(spec=('s', 'spec-file', 'spec file for rpm build process'), identi
 
     tf_config = pystache.render(open(template).read(), {
         'credentials': dict(credentials), 'command': {'identifier': identifier},
-        'application': {'ssh_key': ssh_pub_key(tmp_file[1])}})
+        'application': {
+            'ssh_key': ssh_pub_key(tmp_file[1]),
+            'user_data': open(user_data).read().replace('\n', '\\n')
+        }
+    })
 
     d = tempfile.mkdtemp()
     with open(os.path.join(d, 'main.tf'), 'w') as tf_file:
@@ -87,7 +106,7 @@ def rpm_build(spec=('s', 'spec-file', 'spec file for rpm build process'), identi
 
     import python_terraform as tf
     option_dict = dict()
-    #option_dict['input'] = False
+    # option_dict['input'] = False
     option_dict['auto-approve'] = True
     tf = tf.Terraform(working_dir=d)
 
@@ -123,17 +142,51 @@ def rpm_build(spec=('s', 'spec-file', 'spec file for rpm build process'), identi
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
     import time
-    import socket
 
     while True:
         time.sleep(10)
+        print('Waiting 10s')
         try:
-            client.connect(public_dns, username='ec2-user',
-                           key_filename=tmp_file[1])
-        except socket.gaierror as e:
+            client.connect(
+                public_dns, username='ec2-user', key_filename=tmp_file[1])
+        except Exception as e:
             continue
-        finally:
+        else:
             break
+    print('ssh -i %s ec2-user@%s' % (tmp_file[1], public_dns))
+
+    cmd = 'mkdir -p /home/ec2-user/rpmbuild/{SPECS,RPMS,SRPMS,SOURCES,BUILD,BUILDROOT}'
+    client.exec_command(cmd)
+    sftp = paramiko.SFTPClient.from_transport(client.get_transport())
+    sftp.put(spec, '/home/ec2-user/rpmbuild/SPECS/%s' % os.path.basename(spec))
+
+    import urllib.request
+    archive = tempfile.mkstemp()
+    archive_name = os.path.basename(binary_options['Source0'])
+    urllib.request.urlretrieve(binary_options['Source0'], archive[1])
+    package = os.path.basename(spec)
+    sftp.put(archive[1], '/home/ec2-user/rpmbuild/SOURCES/%s' % archive_name)
+    stdin, stdout, stderr = client.exec_command(
+        'rpmbuild -bp /home/ec2-user/rpmbuild/SPECS/%s' % package)
+    print(stdout.read())
+    stdin, stdout, stderr = client.exec_command(
+        'rpmbuild -bc --short-circuit /home/ec2-user/rpmbuild/SPECS/%s' % package)
+    print(stdout.read())
+    stdin, stdout, stderr = client.exec_command(
+        'rpmbuild -bi --short-circuit /home/ec2-user/rpmbuild/SPECS/%s' % package)
+    print(stdout.read())
+    stdin, stdout, stderr = client.exec_command(
+        'rpmbuild -ba /home/ec2-user/rpmbuild/SPECS/%s' % package)
+    print(stdout.read())
+
+    print(binary_options)
+    files = []
+    files.append(
+        '/home/ec2-user/rpmbuild/RPMS/noarch/python36-six-1.11.0-2.amzn1.noarch.rpm')
+    files.append(
+        '/home/ec2-user/rpmbuild/SRPMS/python36-six-1.11.0-2.amzn1.src.rpm')
+    for binary in files:
+        sftp.get(binary, '/tmp/%s' % os.path.basename(binary))
 
     client.close()
 
