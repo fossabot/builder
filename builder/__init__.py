@@ -145,7 +145,6 @@ def rpm_build(spec=('s', 'spec-file', 'spec file for rpm build process'), identi
 
     while True:
         time.sleep(10)
-        print('Waiting 10s')
         try:
             client.connect(
                 public_dns, username='ec2-user', key_filename=tmp_file[1])
@@ -153,7 +152,6 @@ def rpm_build(spec=('s', 'spec-file', 'spec file for rpm build process'), identi
             continue
         else:
             break
-    print('ssh -i %s ec2-user@%s' % (tmp_file[1], public_dns))
 
     cmd = 'mkdir -p /home/ec2-user/rpmbuild/{SPECS,RPMS,SRPMS,SOURCES,BUILD,BUILDROOT}'
     client.exec_command(cmd)
@@ -167,24 +165,19 @@ def rpm_build(spec=('s', 'spec-file', 'spec file for rpm build process'), identi
     package = os.path.basename(spec)
     sftp.put(archive[1], '/home/ec2-user/rpmbuild/SOURCES/%s' % archive_name)
     stdin, stdout, stderr = client.exec_command(
-        'rpmbuild -bp /home/ec2-user/rpmbuild/SPECS/%s' % package)
-    print(stdout.read())
+        'rpmbuild -bp /home/ec2-user/rpmbuild/SPECS/%s' % package, get_pty=True)
     stdin, stdout, stderr = client.exec_command(
-        'rpmbuild -bc --short-circuit /home/ec2-user/rpmbuild/SPECS/%s' % package)
-    print(stdout.read())
+        'rpmbuild -bc --short-circuit /home/ec2-user/rpmbuild/SPECS/%s' % package, get_pty=True)
     stdin, stdout, stderr = client.exec_command(
-        'rpmbuild -bi --short-circuit /home/ec2-user/rpmbuild/SPECS/%s' % package)
-    print(stdout.read())
+        'rpmbuild -bi --short-circuit /home/ec2-user/rpmbuild/SPECS/%s' % package, get_pty=True)
     stdin, stdout, stderr = client.exec_command(
-        'rpmbuild -ba /home/ec2-user/rpmbuild/SPECS/%s' % package)
-    print(stdout.read())
-
-    print(binary_options)
+        'rpmbuild -ba /home/ec2-user/rpmbuild/SPECS/%s' % package, get_pty=True)
     files = []
-    files.append(
-        '/home/ec2-user/rpmbuild/RPMS/noarch/python36-six-1.11.0-2.amzn1.noarch.rpm')
-    files.append(
-        '/home/ec2-user/rpmbuild/SRPMS/python36-six-1.11.0-2.amzn1.src.rpm')
+    for line in stdout.readlines():
+        if line.startswith('Wrote'):
+            _, path = line.split(':')
+            files.append(path.strip())
+
     for binary in files:
         sftp.get(binary, '/tmp/%s' % os.path.basename(binary))
 
