@@ -183,6 +183,13 @@ def rpm_build(spec=('s', 'spec-file', 'spec file for rpm build process'), identi
 
     client.close()
 
+    try:
+        return_code, stdout, stderr = tf.destroy(d)
+    except FileNotFoundError:
+        raise RuntimeError('Terraform not found')
+        import sys
+        sys.exit(1)
+
     return True
 
 
