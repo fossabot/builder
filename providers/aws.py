@@ -5,6 +5,10 @@ class Aws(object):
 
     __identifier__ = 'aws'
 
+    __target__ = 'instance'
+
+    __ssh__user__ = 'ec2-user'
+
     def get_credentials(self):
         """
             Get credentials for AWS

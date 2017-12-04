@@ -1,5 +1,8 @@
 import opster
 import paramiko
+import logging
+logging.getLogger("paramiko").setLevel(logging.DEBUG) # for example
+
 
 
 def ssh_pub_key(key_file):
@@ -26,7 +29,7 @@ def register(provider=('p', 'aws', 'provider to register')):
         import sys
         sys.exit(1)
 
-    class_name = provider.capitalize()
+    class_name = get_class_name(provider)
     cls = getattr(module, class_name)
     instance = cls()
     credentials = instance.get_credentials()
@@ -66,6 +69,15 @@ def rpm_build(spec=('s', 'spec-file', 'spec file for rpm build process'), target
     else:
         provider = internal_config[target]['provider']
 
+    # Import provider method
+
+    import importlib
+
+    module = importlib.import_module('providers.%s' % provider)
+    class_name = get_class_name(provider)
+    cls = getattr(module, class_name)
+    instance = cls()
+
     import re
     import sys
     import os
@@ -86,7 +98,7 @@ def rpm_build(spec=('s', 'spec-file', 'spec file for rpm build process'), target
     config.read(os.path.expanduser('~/.config/builder.cfg'))
     try:
         credentials = config.items(provider)
-    except KeyError:
+    except NoSectionError:
         raise RuntimeError('Unregistered provider')
         import sys
         sys.exit(1)
@@ -145,46 +157,79 @@ def rpm_build(spec=('s', 'spec-file', 'spec file for rpm build process'), target
     import json
     tfstate = json.loads(open(os.path.join(d, 'terraform.tfstate')).read())
 
-    public_dns = tfstate['modules'][0]['resources']['aws_instance.builder']['primary']['attributes']['public_dns']
+    public_dns = tfstate['modules'][0]['resources']['%s_%s.builder' % (provider.replace('_', ''), instance.__target__)]['primary']['attributes']['ipv4_address']
 
     client = paramiko.SSHClient()
 
     # Avoid missing host entry
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
+    # SSH username
+    username = 'root'
+    try:
+        username = instance.__ssh__user__
+    except AttributeError:
+        pass
+
     import time
 
     while True:
         time.sleep(10)
+        print('Waiting 10s for ssh -i %s %s@%s' % (tmp_file[1], username, public_dns))
         try:
             client.connect(
-                public_dns, username='ec2-user', key_filename=tmp_file[1])
+                public_dns, username=username, key_filename=tmp_file[1])
         except Exception as e:
+            print(e)
             continue
         else:
             break
 
-    cmd = 'mkdir -p /home/ec2-user/rpmbuild/{SPECS,RPMS,SRPMS,SOURCES,BUILD,BUILDROOT}'
+    remote_env = {}
+    stdin, stdout, stderr = client.exec_command('env')
+    for line in stdout.readlines():
+        key, value = line.strip().split('=', 1) # split on first occurrence since some var could contain = (ex: DBUS_SESSION_BUS_ADDRESS)
+        remote_env[key] = value
+
+    # Wait cloud-init to finish
+    # TODO: use a agnostic way (non linux only) to check that instance is ready
+
+    while True:
+        stdin, stdout, stderr = client.exec_command('pgrep cloud-init')
+        lines = stdout.readlines()
+        line_number = len(lines)
+        time.sleep(10)
+        if line_number == 0:
+            break
+
+    cmd = 'mkdir -p %s/rpmbuild/{SPECS,RPMS,SRPMS,SOURCES,BUILD,BUILDROOT}' % remote_env['HOME']
     client.exec_command(cmd)
     sftp = paramiko.SFTPClient.from_transport(client.get_transport())
-    sftp.put(spec, '/home/ec2-user/rpmbuild/SPECS/%s' % os.path.basename(spec))
+    sftp.put(spec, '%s/rpmbuild/SPECS/%s' % (remote_env['HOME'], os.path.basename(spec)))
 
     import urllib.request
     archive = tempfile.mkstemp()
     archive_name = os.path.basename(binary_options['Source0'])
     urllib.request.urlretrieve(binary_options['Source0'], archive[1])
     package = os.path.basename(spec)
-    sftp.put(archive[1], '/home/ec2-user/rpmbuild/SOURCES/%s' % archive_name)
+    sftp.put(archive[1], '%s/rpmbuild/SOURCES/%s' % (remote_env['HOME'], archive_name))
     stdin, stdout, stderr = client.exec_command(
-        'rpmbuild -bp /home/ec2-user/rpmbuild/SPECS/%s' % package, get_pty=True)
+        'rpmbuild -bp %s/rpmbuild/SPECS/%s' % (remote_env['HOME'], package), get_pty=True)
+    for line in stdout.readlines():
+        print(line.strip())
     stdin, stdout, stderr = client.exec_command(
-        'rpmbuild -bc --short-circuit /home/ec2-user/rpmbuild/SPECS/%s' % package, get_pty=True)
+        'rpmbuild -bc --short-circuit %s/rpmbuild/SPECS/%s' % (remote_env['HOME'], package), get_pty=True)
+    for line in stdout.readlines():
+        print(line.strip())
     stdin, stdout, stderr = client.exec_command(
-        'rpmbuild -bi --short-circuit /home/ec2-user/rpmbuild/SPECS/%s' % package, get_pty=True)
+        'rpmbuild -bi --short-circuit %s/rpmbuild/SPECS/%s' % (remote_env['HOME'], package), get_pty=True)
+    for line in stdout.readlines():
+        print(line.strip())
     stdin, stdout, stderr = client.exec_command(
-        'rpmbuild -ba /home/ec2-user/rpmbuild/SPECS/%s' % package, get_pty=True)
+        'rpmbuild -ba %s/rpmbuild/SPECS/%s' % (remote_env['HOME'], package), get_pty=True)
     files = []
     for line in stdout.readlines():
+        print(line.strip())
         if line.startswith('Wrote'):
             _, path = line.split(':')
             files.append(path.strip())
@@ -206,3 +251,16 @@ def rpm_build(spec=('s', 'spec-file', 'spec file for rpm build process'), target
 
 def cli():
     opster.dispatch()
+
+def get_module_name(name):
+    import re
+    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+
+def get_class_name(string):
+    """
+        Note inspired by `StringCase <https://pypi.python.org/pypi/stringcase>`_
+    """
+    import re
+    string = re.sub(r"^[\-_\.]", '', str(string))
+    return string[0].upper() + re.sub(r"[\-_\.\s]([a-z])", lambda matched: (matched.group(1)).capitalize(), string[1:])

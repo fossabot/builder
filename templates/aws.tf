@@ -34,7 +34,7 @@ resource "aws_instance" "builder" {
   key_name = "${aws_key_pair.builder.key_name}"
 
   // Cloud-init
-  user_data = "{{{application.user_data}}}"
+  user_data = "#cloud-config\n{{{application.user_data}}}"
 
 }
 
