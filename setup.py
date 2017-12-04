@@ -48,6 +48,7 @@ distutils.core.setup(
     zip_safe=False,
     install_requires=open('requirements.txt').readlines(),
     data_files=[
+        ('.', glob.glob('MAPPING.ini')),
         ('templates', glob.glob('templates/*.tf')),
         ('profiles', glob.glob('profiles/*.yml'))
     ],

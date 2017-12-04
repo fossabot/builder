@@ -46,14 +46,25 @@ def register(provider=('p', 'aws', 'provider to register')):
 
 
 @opster.command()
-def rpm_build(spec=('s', 'spec-file', 'spec file for rpm build process'), identifier=('i', 'os-identifier', 'Target identifier (will help choose the cloud provider)')):
+def rpm_build(spec=('s', 'spec-file', 'spec file for rpm build process'), target=('t', 'target', 'Operating system targeted by this package')):
     """ Build rpm """
-    if identifier.startswith('ami'):
-        provider = 'aws'
-    else:
-        raise RuntimeError('Unsupported provider')
+
+    import os
+
+    current_directory = os.path.dirname(os.path.realpath(__file__))
+    mapping_configuration = os.path.join(current_directory, '..', 'MAPPING.ini')
+
+    import configparser
+
+    internal_config = configparser.ConfigParser()
+    internal_config.read(mapping_configuration)
+    targets = internal_config.sections()
+    if not target in targets:
         import sys
+        sys.stderr.write('Unsupported platform')
         sys.exit(1)
+    else:
+        provider = internal_config[target]['provider']
 
     import re
     import sys
@@ -93,7 +104,7 @@ def rpm_build(spec=('s', 'spec-file', 'spec file for rpm build process'), identi
     key.write_private_key_file(tmp_file[1])
 
     tf_config = pystache.render(open(template).read(), {
-        'credentials': dict(credentials), 'command': {'identifier': identifier},
+        'credentials': dict(credentials), 'command': {'identifier': internal_config[target]['internal'] },
         'application': {
             'ssh_key': ssh_pub_key(tmp_file[1]),
             'user_data': open(user_data).read().replace('\n', '\\n')

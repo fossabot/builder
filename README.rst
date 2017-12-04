@@ -48,5 +48,5 @@ Building could be made on any cloud, but
 
 .. code-block:: bash
 
-  $ builder build-rpm -s ~/workspace/specs/python-six.spec -i ami-8c1be5f6
+  $ builder build-rpm -s ~/workspace/specs/python-six.spec -t amzn
 
