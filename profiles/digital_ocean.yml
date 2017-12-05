@@ -1,9 +1,2 @@
 packages:
  - rpm-build
- - cmake
- - gcc-c++
- - gtk3-devel
- #- haskell-platform
- #- gmp-devel
- #- postgresql-devel
- #- zlib-devel
