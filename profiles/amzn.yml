@@ -1,0 +1,2 @@
+runcmd:
+  - [alternatives, --set, ruby, /usr/bin/ruby2.4]
