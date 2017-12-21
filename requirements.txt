@@ -1,14 +1,16 @@
 # command line utility
-opster >= 4.1
+opster == 4.1
 
 # terraform wrapper
-python-terraform >= 0.9.1
+python-terraform == 0.9.1
 
 # logic-less template engine
 # to build terraform configuration file
-pystache >= 0.5.4
+pystache == 0.5.4
 
 # Python ssh utilities
 # All stuff will be executed throught an SSH tunnel
+paramiko == 2.4.0
 
-paramiko >= 2.4.0
+# Parse rpm spec files
+-e git+https://github.com/bkircher/python-rpm-spec.git#egg=python-rpm-spec python-rpm-spec
