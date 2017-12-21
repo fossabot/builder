@@ -10,6 +10,9 @@ python:
   - 3.6 # fedora
   - nightly
 
+# Use pip cache to speed-up the build
+cache: pip
+
 # No problem if test failed on nightly python releases
 matrix:
   allow_failures:
