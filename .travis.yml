@@ -24,6 +24,9 @@ install:
   - pip install pyflakes
   - pip install codecov
 
+# Use standard python test process
+script: python -m unittest
+
 # If test suite is successful, update coverage
 after_success:
   - codecov
