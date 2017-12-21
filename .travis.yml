@@ -1,23 +1,28 @@
+# This tools is powered by python
+# but only 3.x
 language: python
 
+# Distributions targets python version
+# Ensure this tool could be installed on major linux distros
 python:
   - 3.4 # el7
   - 3.5 # debian / ubuntu
   - 3.6 # fedora
   - nightly
 
+# No problem if test failed on nightly python releases
 matrix:
   allow_failures:
     - python: nightly
 
+# Install python librairies
 install:
   - pip install -r requirements.txt
   - pip install pyflakes
+  - pip install codecov
 
-script: python -m unittest
-
+# If test suite is successful, update coverage
 after_success:
-  - coveralls
-  - pip install pycodestyle pyflakes
+  - codecov
   - pycodestyle .
   - pyflakes .
