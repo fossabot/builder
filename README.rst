@@ -1,52 +1,59 @@
 builder
-########################################
+##########
 
-builder is a command line tool to help sysadmin packaging **binaries**
+.. image:: https://travis-ci.org/waghanza/builder.svg?branch=master
+  :target: https://travis-ci.org/waghanza/builder
+  :alt: Build status
 
-As I am essentially working on **red hast** _based_ distributions, **builder** will prio target `rpm` packages.
+.. image:: https://codecov.io/gh/waghanza/builder/branch/master/graph/badge.svg
+  :target: https://codecov.io/gh/waghanza/builder
+  :alt: Coverage rate
 
-However, other **binary** formats, will follow.
+.. image:: https://api.codeclimate.com/v1/badges/d74dcea55798c4c86b4d/maintainability
+   :target: https://codeclimate.com/github/waghanza/builder/maintainability
+   :alt: Maintainability
 
-Main features
-=============
+.. image:: https://bestpractices.coreinfrastructure.org/projects/1506/badge
+  :target: https://bestpractices.coreinfrastructure.org/projects/1506)
+  :alt: Best practices
 
-* RPM building
+.. image:: https://gemnasium.com/badges/github.com/waghanza/builder.svg
+  :target: https://gemnasium.com/github.com/waghanza/builder
+  :alt: Dependency Status
+
+:Builder:     Command line packaging toolchain
+:Copyright:   Copyright (c) 2017 Marwan Rabbâa <waghanza@gmail.com>
+:License:     `MIT <https://opensource.org/licenses/MIT>_`
+:Homepage:    http://package-builder.readthedocs.io
 
 
 Installation
-============
+##########
 
+Requirements
+~~~~~~~~~~
 
-Python version
---------------
+- `Python 3 <https://www.python.org/downloads/release/python-363>`_
+- `Paramiko <http://www.paramiko.org>`_
 
-Although Python 2 **SHOULD** be *supported*, it is recommended to install
-*builder* against the latest Python 3.x whenever possible.
+Nightly
+~~~~~~~~~~
 
-See travis configuration file for tested python versions
+.. code:: shell
 
+  pip3 install git+https://github.com/waghanza/builder
 
-Unstable version
-----------------
+Maintainers
+##########
 
-You can also instead of the latest the latest unreleased development version
-directly from the ``master`` branch on GitHub.
-It is a work-in-progress of a future stable release so the experience
-might be not as smooth.
+- `waghanza <https://github.com/waghanza>`_
 
-.. code-block:: bash
+Contribute
+##########
 
-    $ pip install git+https://github.com/waghanza/builder.git@master#builder
+Pull requests are welcome :heart: and really apprciated
 
+License
+##########
 
-Usage
-=============
-
-Building could be made on any cloud, but
-
-+ Build a RPM for **Amazon Linux** `2017.09`
-
-.. code-block:: bash
-
-  $ builder build-rpm -s ~/workspace/specs/python-six.spec -t amzn
-
+MIT © 2017 Marwan Rabbâa

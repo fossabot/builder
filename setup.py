@@ -46,7 +46,15 @@ distutils.core.setup(
     keywords='package linux distribution',
     packages=setuptools.find_packages(),
     zip_safe=False,
-    install_requires=open('requirements.txt').readlines(),
+    install_requires= [
+        'opster == 4.1',
+        'python-terraform == 0.9.1',
+        'pystache == 0.5.4',
+        'paramiko == 2.4.0'
+    ],
+    dependency_links = [
+        'git+https://github.com/bkircher/python-rpm-spec.git#egg=python-rpm-spec'
+    ],
     data_files=[
         ('.', glob.glob('MAPPING.ini')),
         ('templates', glob.glob('templates/*.tf')),
