@@ -32,3 +32,7 @@ after_success:
   - codecov
   - pycodestyle .
   - pyflakes .
+
+# Disable email notification
+notifications:
+  email: false
