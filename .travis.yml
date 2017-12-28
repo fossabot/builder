@@ -20,7 +20,11 @@ matrix:
 
 # Install python librairies
 install:
-  - pip install -r requirements.txt
+  - pip install opster==4.1
+  - pip install python-terraform==0.9.1
+  - pip install pystache==0.5.4
+  - pip install paramiko==2.4.0
+  - pip install git+https://github.com/bkircher/python-rpm-spec.git#egg=python-rpm-spec
   - pip install pyflakes
   - pip install codecov
 
