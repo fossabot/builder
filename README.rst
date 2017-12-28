@@ -23,7 +23,7 @@ builder
 
 :Builder:     Command line packaging toolchain
 :Copyright:   Copyright (c) 2017 Marwan Rabbâa <waghanza@gmail.com>
-:License:     `MIT <https://opensource.org/licenses/MIT>_`
+:License:     `MIT <https://opensource.org/licenses/MIT>`_
 :Homepage:    http://package-builder.readthedocs.io
 
 
