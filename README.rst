@@ -1,3 +1,5 @@
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fwaghanza%2Fbuilder.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fwaghanza%2Fbuilder?ref=badge_shield)
+
 builder
 ##########
 
@@ -57,3 +59,7 @@ License
 ##########
 
 MIT © 2017 Marwan Rabbâa
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fwaghanza%2Fbuilder.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fwaghanza%2Fbuilder?ref=badge_large)
