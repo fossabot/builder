@@ -1,5 +1,3 @@
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fwaghanza%2Fbuilder.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fwaghanza%2Fbuilder?ref=badge_shield)
-
 builder
 ##########
 
@@ -22,6 +20,11 @@ builder
 .. image:: https://gemnasium.com/badges/github.com/waghanza/builder.svg
   :target: https://gemnasium.com/github.com/waghanza/builder
   :alt: Dependency Status
+
+.. image:: https://app.fossa.io/projects/git%2Bgithub.com%2Fwaghanza%2Fbuilder?ref=badge_shield
+  :target: https://app.fossa.io/api/projects/git%2Bgithub.com%2Fwaghanza%2Fbuilder.svg?type=shield
+  :alt: Licence status
+
 
 :Builder:     Command line packaging toolchain
 :Copyright:   Copyright (c) 2017 Marwan Rabbâa <waghanza@gmail.com>
